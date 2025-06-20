@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>متجري</title>
+    <style>
+        .product { border: 1px solid #ccc; padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>منتجاتنا</h1>
+    <div id="products"></div>
+    <script>
+        fetch('/products')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('products');
+                data.forEach(prod => {
+                    container.innerHTML += `
+                        <div class="product">
+                            <h2>${prod.name}</h2>
+                            <p>السعر: ${prod.price} درهم</p>
+                            <img src="${prod.image}" width="150">
+                        </div>
+                    `;
+                });
+            });
+    </script>
+</body>
+</html>
