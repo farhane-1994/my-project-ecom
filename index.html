@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Google Sheets Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-light: #a5a1ff;
+            --secondary: #4dabf7;
+            --success: #51cf66;
+            --warning: #fcc419;
+            --danger: #ff6b6b;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --gray: #adb5bd;
+            --gray-light: #e9ecef;
+            
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        .add-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        /* Search and Filter */
+        .search-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .search-bar {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            padding-left: 45px;
+            transition: var(--transition);
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .filter-dropdown {
+            position: relative;
+            min-width: 200px;
+        }
+        
+        .filter-dropdown select {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            appearance: none;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .filter-dropdown select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+        
+        .filter-dropdown::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            pointer-events: none;
+        }
+        
+        /* Sheets Grid */
+        .sheets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+        
+        .sheet-card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sheet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .sheet-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .sheet-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .sheet-category {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        /* Category colors */
+        .category-finance {
+            background-color: #d0ebff;
+            color: #1971c2;
+        }
+        
+        .category-team {
+            background-color: #fff3bf;
+            color: #e67700;
+        }
+        
+        .category-project {
+            background-color: #d3f9d8;
+            color: #2b8a3e;
+        }
+        
+        .category-personal {
+            background-color: #fcc2d7;
+            color: #a61e4d;
+        }
+        
+        .sheet-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .sheet-footer {
+            padding: 15px 20px;
+            background-color: var(--light);
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .open-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .open-btn:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Add Sheet Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+        
+        .close-btn:hover {
+            color: var(--danger);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .cancel-btn {
+            background-color: var(--gray-light);
+            color: var(--dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--gray);
+            color: white;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray-light);
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-bar, .filter-dropdown {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-table"></i>
+                    <span>Sheets Dashboard</span>
+                </div>
+                <button class="add-btn" id="addSheetBtn">
+                    <i class="fas fa-plus"></i>
+                    Add Sheet
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>My Google Sheets Dashboard</h1>
+            <p>This is a personal dashboard for quick access to all my Google Sheets.</p>
+        </div>
+    </section>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search sheets...">
+            </div>
+            <div class="filter-dropdown">
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="finance">Finance</option>
+                    <option value="team">Team Data</option>
+                    <option value="project">Project A</option>
+                    <option value="personal">Personal</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Sheets Grid -->
+        <div class="sheets-grid" id="sheetsGrid">
+            <!-- Sheets will be dynamically added here -->
+        </div>
+    </main>
+    
+    <!-- Add Sheet Modal -->
+    <div class="modal" id="addSheetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Sheet</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="addSheetForm">
+                <div class="form-group">
+                    <label for="sheetTitle">Sheet Title</label>
+                    <input type="text" id="sheetTitle" placeholder="Enter sheet title" required>
+                </div>
+                <div class="form-group">
+                    <label for="sheetUrl">Google Sheet URL</label>
+                    <input type="url" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/..." required>
+                </div>
+                <div class="form-group">
+                    <label for="sheetCategory">Category</label>
+                    <select id="sheetCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="finance">Finance</option>
+                        <option value="team">Team Data</option>
+                        <option value="project">Project A</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sheetDescription">Description</label>
+                    <textarea id="sheetDescription" placeholder="Enter a brief description"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" id="cancelAddBtn">Cancel</button>
+                    <button type="submit" class="submit-btn">Add Sheet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Sample data - in a real app, this would come from a database or API
+        let sheets = [
+            {
+                id: 1,
+                title: "Monthly Budget",
+                url: "https://docs.google.com/spreadsheets/d/1",
+                category: "finance",
+                description: "Track monthly income and expenses"
+            },
+            {
+                id: 2,
+                title: "Team Performance",
+                url: "https://docs.google.com/spreadsheets/d/2",
+                category: "team",
+                description: "Quarterly team metrics and KPIs"
+            },
+            {
+                id: 3,
+                title: "Project Timeline",
+                url: "https://docs.google.com/spreadsheets/d/3",
+                category: "project",
+                description: "Milestones and deadlines for Project A"
+            },
+            {
+                id: 4,
+                title: "Content Calendar",
+                url: "https://docs.google.com/spreadsheets/d/4",
+                category: "team",
+                description: "Social media and blog post schedule"
+            },
+            {
+                id: 5,
+                title: "Personal Goals",
+                url: "https://docs.google.com/spreadsheets/d/5",
+                category: "personal",
+                description: "Yearly personal development goals"
+            },
+            {
+                id: 6,
+                title: "Expense Tracker",
+                url: "https://docs.google.com/spreadsheets/d/6",
+                category: "finance",
+                description: "Daily expense tracking"
+            }
+        ];
+        
+        // DOM Elements
+        const sheetsGrid = document.getElementById('sheetsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const addSheetBtn = document.getElementById('addSheetBtn');
+        const addSheetModal = document.getElementById('addSheetModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelAddBtn = document.getElementById('cancelAddBtn');
+        const addSheetForm = document.getElementById('addSheetForm');
+        
+        // Load sheets on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSheets(sheets);
+            
+            // Load from localStorage if available
+            const savedSheets = localStorage.getItem('googleSheets');
+            if (savedSheets) {
+                sheets = JSON.parse(savedSheets);
+                renderSheets(sheets);
+            }
+        });
+        
+        // Render sheets to the grid
+        function renderSheets(sheetsToRender) {
+            sheetsGrid.innerHTML = '';
+            
+            if (sheetsToRender.length === 0) {
+                sheetsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-table"></i>
+                        <h3>No sheets found</h3>
+                        <p>Add a new sheet to get started</p>
+                        <button class="add-btn" id="addFirstSheetBtn">
+                            <i class="fas fa-plus"></i>
+                            Add Sheet
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('addFirstSheetBtn').addEventListener('click', () => {
+                    addSheetModal.style.display = 'flex';
+                });
+                
+                return;
+            }
+            
+            sheetsToRender.forEach(sheet => {
+                const sheetCard = document.createElement('div');
+                sheetCard.className = 'sheet-card';
+                
+                // Determine category class and display name
+                let categoryClass = '';
+                let categoryDisplay = '';
+                
+                switch(sheet.category) {
+                    case 'finance':
+                        categoryClass = 'category-finance';
+                        categoryDisplay = 'Finance';
+                        break;
+                    case 'team':
+                        categoryClass = 'category-team';
+                        categoryDisplay = 'Team Data';
+                        break;
+                    case 'project':
+                        categoryClass = 'category-project';
+                        categoryDisplay = 'Project A';
+                        break;
+                    case 'personal':
+                        categoryClass = 'category-personal';
+                        categoryDisplay = 'Personal';
+                        break;
+                    default:
+                        categoryClass = 'category-finance';
+                        categoryDisplay = sheet.category;
+                }
+                
+                sheetCard.innerHTML = `
+                    <div class="sheet-header">
+                        <h3 class="sheet-title">${sheet.title}</h3>
+                        <span class="sheet-category ${categoryClass}">${categoryDisplay}</span>
+                        <p class="sheet-description">${sheet.description}</p>
+                    </div>
+                    <div class="sheet-footer">
+                        <button class="open-btn" data-url="${sheet.url}">
+                            <i class="fas fa-external-link-alt"></i>
+                            Open Sheet
+                        </button>
+                    </div>
+                `;
+                
+                sheetsGrid.appendChild(sheetCard);
+            });
+            
+            // Add event listeners to all open buttons
+            document.querySelectorAll('.open-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.open(btn.dataset.url, '_blank');
+                });
+            });
+        }
+        
+        // Filter sheets based on search and category
+        function filterSheets() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            
+            const filteredSheets = sheets.filter(sheet => {
+                const matchesSearch = sheet.title.toLowerCase().includes(searchTerm) || 
+                                      sheet.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = category === 'all' || sheet.category === category;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            renderSheets(filteredSheets);
+        }
+        
+        // Event listeners for filtering
+        searchInput.addEventListener('input', filterSheets);
+        categoryFilter.addEventListener('change', filterSheets);
+        
+        // Modal functionality
+        addSheetBtn.addEventListener('click', () => {
+            addSheetModal.style.display = 'flex';
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            addSheetModal.style.display = 'none';
+        });
+        
+        cancelAddBtn.addEventListener('click', () => {
+            addSheetModal.style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === addSheetModal) {
+                addSheetModal.style.display = 'none';
+            }
+        });
+        
+        // Add new sheet
+        addSheetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newSheet = {
+                id: sheets.length > 0 ? Math.max(...sheets.map(s => s.id)) + 1 : 1,
+                title: document.getElementById('sheetTitle').value,
+                url: document.getElementById('sheetUrl').value,
+                category: document.getElementById('sheetCategory').value,
+                description: document.getElementById('sheetDescription').value || 'No description'
+            };
+            
+            sheets.push(newSheet);
+            localStorage.setItem('googleSheets', JSON.stringify(sheets));
+            
+            // Reset form and close modal
+            addSheetForm.reset();
+            addSheetModal.style.display = 'none';
+            
+            // Re-render sheets
+            renderSheets(sheets);
+            filterSheets();
+        });
+    </script>
+</body>
+</html>
